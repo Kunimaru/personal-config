@@ -6,9 +6,9 @@ export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 # Deploy personal configuration files
 TMP_DIR=$(mktemp -d)
 trap 'rm -rf "$TMP_DIR"' EXIT
-curl -fsSL https://codeload.github.com/Kunimaru/personal-configuration-files/tar.gz/refs/heads/main -o "$TMP_DIR/personal-configuration-files.tar.gz"
-tar -xzf "$TMP_DIR/personal-configuration-files.tar.gz" -C "$TMP_DIR"
-REMOTE_CONFIG_DIR="$TMP_DIR/personal-configuration-files-main/config"
+curl -fsSL https://codeload.github.com/Kunimaru/personal-config/tar.gz/refs/heads/main -o "$TMP_DIR/personal-config.tar.gz"
+tar -xzf "$TMP_DIR/personal-config.tar.gz" -C "$TMP_DIR"
+REMOTE_CONFIG_DIR="$TMP_DIR/personal-config-main/config"
 if [ ! -d "$REMOTE_CONFIG_DIR" ]; then
     echo "Remote config directory not found: $REMOTE_CONFIG_DIR" >&2
     exit 1
