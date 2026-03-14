@@ -1,0 +1,58 @@
+# Add user to sudoers
+# su root -c "/sbin/adduser $USER sudo && pkill -u $USER"
+
+export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+# Deploy personal configuration files
+TMP_DIR=$(mktemp -d)
+trap 'rm -rf "$TMP_DIR"' EXIT
+curl -fsSL https://codeload.github.com/Kunimaru/personal-configuration-files/tar.gz/refs/heads/main -o "$TMP_DIR/personal-configuration-files.tar.gz"
+tar -xzf "$TMP_DIR/personal-configuration-files.tar.gz" -C "$TMP_DIR"
+REMOTE_CONFIG_DIR="$TMP_DIR/personal-configuration-files-main/config"
+if [ ! -d "$REMOTE_CONFIG_DIR" ]; then
+    echo "Remote config directory not found: $REMOTE_CONFIG_DIR" >&2
+    exit 1
+fi
+mkdir -p "$HOME/.config"
+find "$REMOTE_CONFIG_DIR" -mindepth 1 -maxdepth 1 ! -name '.git' -exec cp -a {} "$HOME/" \;
+
+# Add "contrib" and "non-free" to /etc/apt/sources.list
+sudo vi -N /etc/apt/sources.list
+
+# Install aptitude packages
+sudo apt update
+sudo apt install -y curl docker fonts-liberation git gnome-shell-extension-dashtodock gnome-shell-extension-gpaste ibus-mozc pulseaudio ufw xsel zsh
+
+# Set zsh as default
+sudo chsh -s /bin/zsh $USER
+
+# Setup Git
+git config --global push.default current
+
+# Generate SSH for Github
+ssh-keygen -t ed25519
+
+echo '# Install these packages manually.'
+
+# Install gTile
+echo 'gTile: https://www.google.com/search?q=gtile'
+firefox-esr --new-tab 'https://www.google.com/search?q=gtile'
+
+# Install Bedtime Mode
+echo 'Bedtime Mode: https://www.google.com/search?q=gnome+bedtime+mode'
+firefox-esr --new-tab 'https://www.google.com/search?q=gnome+bedtime+mode'
+
+# Install Google Chrome
+echo 'Google Chrome: https://www.google.com/search?q=google+chrome'
+firefox-esr --new-tab 'https://www.google.com/search?q=google+chrome'
+
+# Install Zed
+echo 'Zed: https://www.google.com/search?q=zed'
+firefox-esr --new-tab 'https://www.google.com/search?q=zed'
+
+read -p 'Press enter to reboot...' TMP
+sudo reboot
+
+# Setup input method
+# im-config
+# ibus-setup
