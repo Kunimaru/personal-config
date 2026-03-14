@@ -34,6 +34,14 @@ ssh-keygen -t ed25519
 
 echo '# Install these packages manually.'
 
+# Install Alacritty
+echo 'Alacritty: https://www.google.com/search?q=alacritty'
+firefox-esr --new-tab 'https://www.google.com/search?q=alacritty'
+
+# Install Zed
+echo 'Zed: https://www.google.com/search?q=zed'
+firefox-esr --new-tab 'https://www.google.com/search?q=zed'
+
 # Install gTile
 echo 'gTile: https://www.google.com/search?q=gtile'
 firefox-esr --new-tab 'https://www.google.com/search?q=gtile'
@@ -45,10 +53,6 @@ firefox-esr --new-tab 'https://www.google.com/search?q=gnome+bedtime+mode'
 # Install Google Chrome
 echo 'Google Chrome: https://www.google.com/search?q=google+chrome'
 firefox-esr --new-tab 'https://www.google.com/search?q=google+chrome'
-
-# Install Zed
-echo 'Zed: https://www.google.com/search?q=zed'
-firefox-esr --new-tab 'https://www.google.com/search?q=zed'
 
 read -p 'Press enter to reboot...' TMP
 sudo reboot
