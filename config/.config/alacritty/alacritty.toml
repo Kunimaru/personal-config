@@ -3,3 +3,4 @@ dimensions = { columns = 80, lines = 20 }
 
 [font]
 normal = { family = "Google Sans Code", style = "Regular" }
+size = 8
