@@ -1,11 +1,21 @@
 # Basics
 export LANG=en_US.UTF-8
-export PATH="$PATH"
+export PATH="$HOME/.local/bin:$PATH"
 
 autoload -Uz colors
 colors
 autoload -Uz compinit
 compinit
+
+# Resolve SSD by UUID
+# _SSD_UUID=""
+# STORAGE_PATH=$(findmnt -rn -o TARGET --source UUID="$_SSD_UUID" 2>/dev/null)
+export STORAGE_PATH="${STORAGE_PATH:-$HOME}"
+
+# Package Manager Paths
+export CARGO_TARGET_DIR="$STORAGE_PATH/cargo-target"
+export NPM_CONFIG_STORE_DIR="$STORAGE_PATH/.pnpm-store"
+export UV_CACHE_PATH="$STORAGE_PATH/uv-cache"
 
 # Key Bindings
 bindkey -v
@@ -14,8 +24,8 @@ stty erase "^?"
 
 # History
 HISTFILE=~/.zsh_history
-HISTSIZE=10000
-SAVEHIST=10000
+HISTSIZE=1000000
+SAVEHIST=1000000
 setopt share_history hist_ignore_all_dups hist_reduce_blanks
 
 # Other Options
@@ -72,7 +82,6 @@ _tmux_split_column() {
     tmux split-window -d -v -p 50 -t "$pane_id"
   fi
 }
-
 _tmux_new_session_name() {
   local base_name=$1
   local timestamp
@@ -90,7 +99,6 @@ _tmux_new_session_name() {
     sleep 1
   done
 }
-
 _tmux_attach_grid() {
   local base_name=$1
   local rows=$2
@@ -108,11 +116,9 @@ _tmux_attach_grid() {
 
   tmux attach-session -t "$session_name"
 }
-
 tmux6() {
   _tmux_attach_grid tmux6 3
 }
-
 tmux8() {
   _tmux_attach_grid tmux8 4
 }
@@ -124,11 +130,11 @@ alias reboot='sudo reboot'
 
 alias apt='sudo apt' aptug='sudo apt update && sudo apt upgrade -y && sudo apt autoclean && sudo apt autoremove -y --purge'
 
-## Utilities
-alias pbcopy='xsel --clipboard --input' pbpaste='xsel --clipboard --output'
-
 ## Git
 alias gst='git status' gl='git log' gb='git branch' gc='git checkout' gcb='git checkout -b' gplo='git pull origin' gmg='git merge' gad='git add' gcm='git commit -m' gsts='git stash' gstsp='git stash pop' gpso='git push origin'
 
 ## Docker
 alias dckr-stop='sudo docker kill $(sudo docker ps -q) && sudo docker rm $(sudo docker ps -a -q)'
+
+## Utilities
+alias pbcopy='xsel --clipboard --input' pbpaste='xsel --clipboard --output'
