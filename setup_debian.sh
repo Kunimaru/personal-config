@@ -11,7 +11,7 @@ sudo vi -N /etc/apt/sources.list
 
 # Install aptitude packages
 sudo apt update
-sudo apt install -y curl docker fonts-liberation git gnome-shell-extension-dashtodock gnome-shell-extension-gpaste ibus-mozc pulseaudio ufw xsel zsh
+sudo apt install -y curl docker fonts-liberation git gnome-shell-extension-dashtodock gnome-shell-extension-gpaste ibus-mozc pulseaudio tmux ufw xsel zsh
 
 # Set zsh as default
 sudo chsh -s /bin/zsh $USER
