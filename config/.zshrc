@@ -7,15 +7,19 @@ colors
 autoload -Uz compinit
 compinit
 
-# Resolve SSD by UUID
-# _SSD_UUID=""
-# STORAGE_PATH=$(findmnt -rn -o TARGET --source UUID="$_SSD_UUID" 2>/dev/null)
-export STORAGE_PATH="${STORAGE_PATH:-$HOME}"
-
 # Package Manager Paths
-export CARGO_TARGET_DIR="$STORAGE_PATH/cargo-target"
-export NPM_CONFIG_STORE_DIR="$STORAGE_PATH/.pnpm-store"
-export UV_CACHE_PATH="$STORAGE_PATH/uv-cache"
+# export CACHE_BASE=
+# export CARGO_HOME="$CACHE_BASE/.cargo"
+# export CARGO_TARGET_DIR="$CACHE_BASE/cargo-target"
+# export DOCKER_TMPDIR="$CACHE_BASE/docker/tmp"
+# export DOCKER_CONFIG="$CACHE_BASE/.docker"
+# export MISE_CACHE_DIR="$CACHE_BASE/mise"
+# export NPM_CONFIG_STORE_DIR="$CACHE_BASE/.pnpm-store"
+# export RUSTUP_HOME="$CACHE_BASE/.rustup"
+# export SCCACHE_DIR="$CACHE_BASE/sccache"
+# export UV_CACHE_PATH="$CACHE_BASE/uv"
+
+# export PATH="$CARGO_HOME/bin:$PATH"
 
 # Key Bindings
 bindkey -v
@@ -66,22 +70,6 @@ function _update_vcs_info_msg() {
 add-zsh-hook precmd _update_vcs_info_msg
 
 # tmux
-_tmux_split_column() {
-  local pane_id=$1
-  local rows=$2
-
-  if [[ $rows -eq 3 ]]; then
-    pane_id=$(tmux split-window -d -v -p 66 -P -F '#{pane_id}' -t "$pane_id")
-    tmux split-window -d -v -p 50 -t "$pane_id"
-    return
-  fi
-
-  if [[ $rows -eq 4 ]]; then
-    pane_id=$(tmux split-window -d -v -p 75 -P -F '#{pane_id}' -t "$pane_id")
-    pane_id=$(tmux split-window -d -v -p 66 -P -F '#{pane_id}' -t "$pane_id")
-    tmux split-window -d -v -p 50 -t "$pane_id"
-  fi
-}
 _tmux_new_session_name() {
   local base_name=$1
   local timestamp
@@ -99,28 +87,53 @@ _tmux_new_session_name() {
     sleep 1
   done
 }
-_tmux_attach_grid() {
-  local base_name=$1
+_tmux_split_rows () {
+  local pane_id=$1
   local rows=$2
+  local remaining=$rows
+  local split_percent
+
+  while (( remaining > 1 ))
+  do
+    split_percent=$(( (remaining - 1) * 100 / remaining ))
+    pane_id=$(tmux split-window -d -v -p "$split_percent" -P -F '#{pane_id}' -t "$pane_id")
+    ((remaining--))
+  done
+}
+_tmux_attach_grid () {
+  local base_name=$1
+  local columns=$2
+  local rows=$3
   local session_name
-  local left_pane
-  local right_pane
-
+  local pane_id
+  local -a pane_ids
+  local remaining=$columns
+  local split_percent
   session_name=$(_tmux_new_session_name "$base_name")
-  left_pane=$(tmux new-session -d -P -F '#{pane_id}' -s "$session_name")
-  right_pane=$(tmux split-window -d -h -P -F '#{pane_id}' -t "$left_pane")
-
-  _tmux_split_column "$left_pane" "$rows"
-  _tmux_split_column "$right_pane" "$rows"
-  tmux select-pane -t "$left_pane"
-
+  pane_id=$(tmux new-session -d -P -F '#{pane_id}' -s "$session_name")
+  pane_ids=("$pane_id")
+  while (( remaining > 1 ))
+  do
+    split_percent=$(( (remaining - 1) * 100 / remaining ))
+    pane_id=$(tmux split-window -d -h -p "$split_percent" -P -F '#{pane_id}' -t "$pane_id")
+    pane_ids+=("$pane_id")
+    ((remaining--))
+  done
+  for pane_id in "${pane_ids[@]}"
+  do
+    _tmux_split_rows "$pane_id" "$rows"
+  done
+  tmux select-pane -t "${pane_ids[1]}"
   tmux attach-session -t "$session_name"
 }
 tmux6() {
-  _tmux_attach_grid tmux6 3
+  _tmux_attach_grid tmux6 2 3
 }
 tmux8() {
-  _tmux_attach_grid tmux8 4
+  _tmux_attach_grid tmux8 2 4
+}
+tmux12 () {
+  _tmux_attach_grid tmux12 3 4
 }
 
 # Aliases
@@ -128,13 +141,23 @@ tmux8() {
 ## System
 alias reboot='sudo reboot'
 
+alias clean='sudo rm -rf "/tmp/*" && rm -rf "$HOME/.cache/*"'
+
 alias apt='sudo apt' aptug='sudo apt update && sudo apt upgrade -y && sudo apt autoclean && sudo apt autoremove -y --purge'
+
+## Docker
+alias dckr-stop='sudo docker kill $(sudo docker ps -q) && sudo docker rm $(sudo docker ps -a -q)'
 
 ## Git
 alias gst='git status' gl='git log' gb='git branch' gc='git checkout' gcb='git checkout -b' gplo='git pull origin' gmg='git merge' gad='git add' gcm='git commit -m' gsts='git stash' gstsp='git stash pop' gpso='git push origin'
 
-## Docker
-alias dckr-stop='sudo docker kill $(sudo docker ps -q) && sudo docker rm $(sudo docker ps -a -q)'
+## tmux
+alias tmux-kill='tmux kill-server'
+
+## AI Tools
+alias cdx='codex --yolo' cld='claude --dangerously-skip-permissions' gmn='gemini --yolo'
+alias cdxug='npm i -g @openai/codex@latest' gmnug='npm i -g @google/gemini-cli@latest'
+alias cdxcdx='codex --model=gpt-5.3-codex --yolo' cdxmin='codex --model=gpt-5.4-mini --yolo'
 
 ## Utilities
 alias pbcopy='xsel --clipboard --input' pbpaste='xsel --clipboard --output'
