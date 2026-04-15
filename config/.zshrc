@@ -14,6 +14,7 @@ compinit
 # export DOCKER_TMPDIR="$CACHE_BASE/docker/tmp"
 # export DOCKER_CONFIG="$CACHE_BASE/.docker"
 # export MISE_CACHE_DIR="$CACHE_BASE/mise"
+# export MISE_DATA_DIR="$CACHE_BASE/mise-data"
 # export NPM_CONFIG_STORE_DIR="$CACHE_BASE/.pnpm-store"
 # export RUSTUP_HOME="$CACHE_BASE/.rustup"
 # export SCCACHE_DIR="$CACHE_BASE/sccache"
